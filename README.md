@@ -78,7 +78,7 @@ In certs folder create 2 files (jwt-private.pem and jwt-public.pem) , there you 
 ```bash
   alembic upgrade head
 ```
-6. run localy using uvicorn
+6. before run localy using uvicorn, mark folder app as root
 ```bash
   uvicorn app.main:app --reload
 ```
