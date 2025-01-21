@@ -4,7 +4,7 @@ from typing import Sequence, Type
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.api_v1.comments.schemas import CommentSchema
+from api.api_v1.comments.schemas import CommentSchema, CommentUpdate
 from core.error_handler import verify_user_exists, verify_ownership
 from db.models.comments.comment import Comment
 
@@ -19,15 +19,28 @@ async def create_comment(
     session: AsyncSession, comment_create: CommentSchema, author_id: int
 ) -> Comment:
     await verify_user_exists(session, author_id)
-
     comment = Comment(
-        content=comment_create.content,
+        content=comment_create.content.strip(),
         blog_id=comment_create.blog_id,
         author_id=comment_create.author_id,
     )
     session.add(comment)
     await session.commit()
     await session.refresh(comment)
+    return comment
+
+
+async def update_comment_service(
+    session: AsyncSession, comment_update: CommentUpdate, author_id: int
+):
+
+    comment = await get_comment_by_id(session, comment_update.id)
+    await verify_ownership(comment.author_id, author_id, session)
+    comment.content = comment_update.content
+    session.add(comment)
+    await session.commit()
+    await session.refresh(comment)  #
+
     return comment
 
 
