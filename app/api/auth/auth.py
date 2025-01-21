@@ -10,7 +10,7 @@ from fastapi.security import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.api_v1.users.crud import get_user, get_user_by_name, get_user_by_email
-from api.api_v1.users.schemas import UserRead, UserLogin, User
+from api.api_v1.users.schemas import UserRead, UserLogin, UserAuthSchema
 from api.auth.schemas import TokenInfo
 from core.config import settings
 
@@ -40,7 +40,7 @@ def create_jwt(
     )
 
 
-def create_access_token(user: User) -> str:
+def create_access_token(user: UserAuthSchema) -> str:
     jwt_payload = {
         "sub": user.username,
         "username": user.username,
@@ -54,7 +54,7 @@ def create_access_token(user: User) -> str:
     )
 
 
-def create_refresh_token(user: User) -> str:
+def create_refresh_token(user: UserAuthSchema) -> str:
     jwt_payload = {"sub": user.username}
     return create_jwt(
         token_type=REFRESH_TOKEN_TYPE,

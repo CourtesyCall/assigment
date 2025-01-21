@@ -16,14 +16,14 @@ from .auth import (
     get_current_user_refresh_token,
 )
 from .schemas import TokenInfo
-from ..api_v1.users.schemas import UserRead, UserLogin, User
+from ..api_v1.users.schemas import UserRead, UserLogin, UserAuthSchema
 
 router = APIRouter(prefix="/auth", tags=["AUTH"])
 
 
 @router.post("/login/", response_model=TokenInfo)
 async def login(
-    user: User = Depends(validate_auth_user),
+    user: UserAuthSchema = Depends(validate_auth_user),
 ):
     access_token = create_access_token(user)
     refresh_token = create_refresh_token(user)
@@ -31,7 +31,7 @@ async def login(
 
 
 @router.post("/refresh/", response_model=TokenInfo, response_model_exclude_none=True)
-async def refresh(user: User = Depends(get_current_user_refresh_token)):
+async def refresh(user: UserAuthSchema = Depends(get_current_user_refresh_token)):
     access_token = create_access_token(user)
 
     return TokenInfo(access_token=access_token)

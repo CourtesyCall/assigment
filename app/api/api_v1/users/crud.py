@@ -132,12 +132,16 @@ async def search_users_by_username_or_email(
     return result.all()
 
 
-async def get_all_users_pag(
-    session: AsyncSession, skip: int, limit: int
-) -> Sequence[User]:
+async def get_all_users_pag(session: AsyncSession, skip: int, limit: int):
+
     query = select(User).offset(skip).limit(limit).order_by(User.id)
-    result = await session.scalars(query)
-    return result.all()
+    print("check")
+    print(query)
+    result = await session.execute(query)
+    users = result.scalars().all()
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+    return users
 
 
 async def user_admin_update(session: AsyncSession, user_id: int):

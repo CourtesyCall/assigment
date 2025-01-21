@@ -1,6 +1,8 @@
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends
+from fastapi.params import Query
+from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models.db_helper import db_helper
@@ -13,9 +15,11 @@ from .crud import (
     search_users_by_username_or_email,
     get_all_users_pag,
     user_admin_update,
+    get_user_by_name,
+    get_user_by_email,
 )
 
-from .schemas import UserRead, UserCreate, UserUpdate
+from .schemas import UserRead, UserCreate, UserUpdate, UserSearchSchema
 from ...auth.auth import get_current_active_auth_user
 
 router = APIRouter(
@@ -39,6 +43,35 @@ async def create_user(
 ):
     user = await create_user_one(session=session, user_create=user_create)
     user.password = user.password.decode("utf-8")
+    return user
+
+
+@router.get(
+    "/pagination",
+    summary="Get a paginated list of users",
+)
+async def get_users_pag(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    skip: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+):
+    print("check 0")
+    users = await get_all_users_pag(session=session, skip=skip, limit=limit)
+
+    return users
+
+
+# @router.get(
+#     "/search",
+#     summary="Search users by username or email",
+# )
+async def search_users(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user: UserSearchSchema,
+):
+    user = await search_users_by_username_or_email(
+        session=session, username=user.username, email=user.email
+    )
     return user
 
 
@@ -72,33 +105,25 @@ async def get_user_by_id(
 
 
 @router.get(
-    "/search",
-    response_model=list[UserRead],
-    summary="Search users by username or email",
+    "/name/{user_name}", response_model=UserRead, summary="Get a user's data by Name"
 )
-async def search_users(
+async def get_user_by_id(
+    user_name: str,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    username: Optional[str] = None,
-    email: Optional[str] = None,
 ):
-    user = await search_users_by_username_or_email(
-        session=session, username=username, email=email
-    )
+    user = await get_user_by_name(session=session, name=user_name)
     return user
 
 
 @router.get(
-    "/pagination",
-    response_model=list[UserRead],
-    summary="Get a paginated list of users",
+    "/email/{email}", response_model=UserRead, summary="Get a user's data by Email"
 )
-async def get_users(
+async def get_user_by_id(
+    email: EmailStr,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    skip: int = 0,
-    limit: int = 10,
 ):
-    users = await get_all_users_pag(session=session, skip=skip, limit=limit)
-    return users
+    user = await get_user_by_email(session=session, email=email)
+    return user
 
 
 @router.put("/dev/{user_id}", response_model=dict, summary="Make user be admin by ID")

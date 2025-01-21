@@ -17,7 +17,12 @@ class UserSchema(BaseModel):
     password: Annotated[str, MinLen(8)]
 
 
-class User(BaseModel):
+class UserSearchSchema(BaseModel):
+    username: str | None = None
+    email: EmailStr | None = None
+
+
+class UserAuthSchema(BaseModel):
     model_config = ConfigDict(strict=True)
     username: str
     password: bytes
