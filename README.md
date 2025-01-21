@@ -71,7 +71,15 @@ Ensure the following are installed:
 In certs folder create 2 files (jwt-private.pem and jwt-public.pem) , there you can put you secret and private key
 
 4. poetry install - it will install all dependencies
-5.
+5. alembic database install
 ```bash
   alembic upgrade head
+```
+6. run localy using uvicorn
+```bash
+  uvicorn app.main:app --reload
+```
+7. Build and Run with Docker
+```bash
+  docker-compose up --build
 ```
