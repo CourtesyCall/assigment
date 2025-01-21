@@ -55,7 +55,7 @@ async def delete_like(session: AsyncSession, like_id: int, user_id: int) -> None
     like = await session.get(Like, like_id)
     if not like:
         raise HTTPException(status_code=404, detail="Like not found")
-    verify_ownership(like.user_id, user_id)
+    await verify_ownership(like.user_id, user_id, session)
     await session.delete(like)
     await session.commit()
 

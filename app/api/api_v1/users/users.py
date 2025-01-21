@@ -12,6 +12,7 @@ from .crud import (
     get_user,
     search_users_by_username_or_email,
     get_all_users_pag,
+    user_admin_update,
 )
 
 from .schemas import UserRead, UserCreate, UserUpdate
@@ -98,3 +99,11 @@ async def get_users(
 ):
     users = await get_all_users_pag(session=session, skip=skip, limit=limit)
     return users
+
+
+@router.put("/dev/{user_id}", response_model=dict, summary="Make user be admin by ID")
+async def make_user_admin(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user_id: int,
+):
+    return await user_admin_update(session=session, user_id=user_id)

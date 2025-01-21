@@ -31,13 +31,11 @@ async def create_comment(
     return comment
 
 
-async def delete_comment(
-    session: AsyncSession, comment_id: int, author_id: int
-) -> None:
+async def delete_comment(session: AsyncSession, comment_id: int, author_id: int):
     await verify_user_exists(session, author_id)
     comment = await get_comment_by_id(session, comment_id)
     if comment:
-        verify_ownership(comment.author_id, author_id)
+        await verify_ownership(comment.author_id, author_id, session)
         await session.delete(comment)
         await session.commit()
 

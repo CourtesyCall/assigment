@@ -138,3 +138,16 @@ async def get_all_users_pag(
     query = select(User).offset(skip).limit(limit).order_by(User.id)
     result = await session.scalars(query)
     return result.all()
+
+
+async def user_admin_update(session: AsyncSession, user_id: int):
+    user = await get_user(user_id=user_id, session=session)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    user.is_admin = True
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return {"message": f"User with ID {user_id} has been updated and now admin."}

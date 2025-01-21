@@ -39,7 +39,7 @@ async def blog_update_service(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorized or not found"
         )
-    verify_ownership(blog.author_id, author_id)
+    await verify_ownership(blog.author_id, author_id, session)
     if blog_update.title:
         blog_update.title = blog_update.title.strip()
     if blog_update.content:
@@ -61,7 +61,7 @@ async def blog_delete_service(session: AsyncSession, blog_id: int, author_id: in
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorized or not found"
         )
-    verify_ownership(blog.author_id, author_id)
+    await verify_ownership(blog.author_id, author_id, session)
     await session.delete(blog)
     await session.commit()
     return {"message": "Blog deleted"}

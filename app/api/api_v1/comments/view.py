@@ -37,5 +37,4 @@ async def delete_existing_comment(
     comment_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
-    await delete_comment(session, comment_id, user.id)
-    return {"message": "Comment deleted"}
+    return await delete_comment(session, comment_id, user.id)
