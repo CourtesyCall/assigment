@@ -22,6 +22,10 @@ The server ensures proper user authentication and authorization, with input vali
 - Basic user registration.
 - Authentication using JWT.
 
+# API Documentation Once running, visit:
+- Swagger UI: http://localhost:8000/docs
+- Redoc: http://localhost:8000/redoc
+
 # Validation and Rules
 - All inputs are validated to remove trailing whitespace.
 - Posts and comments are limited to 1000 characters.
@@ -31,8 +35,41 @@ The server ensures proper user authentication and authorization, with input vali
 - Programming Language: Python (with FastAPI).
 - Database: SQL (PostgreSQL preferred for relational structure).
 - ORM: SQLAlchemy.
-- Migration Tool: Alembic.
+- Migration Tool: Alembic and Poetry.
 - Authentication: Basic Auth and JWT.
 - Containerization: Docker Compose.
 
+## Why PostgreSQL?
+- One of the main reasons is that Postgres is usually used in my workflow and I'm more used to working with it.
+- The second reason is that it's famous in SQL databases.
+- Third - control, scalability and ACID, as well as security, make it easier to work with data through ORM. The relational structure of PostgreSQL provides more guarantees of data integrity and flexibility with increasing application complexity.
+
+# Secret files
+- .env (APP_CONFIG__DB__URL=postgresql+asyncpg://name:password:5432/database-name)
+- certs (jwt-private.pem and jwt-public.pem)
+
+
+### Installation and Setup
+# Prerequisites
+Ensure the following are installed:
+
+- Python 3.10 or later
+- Docker and Docker Compose
+- PostgreSQL
+  1. Clone the Repository
+  ```bash
+   git clone https://github.com/CourtesyCall/assigment.git
+   cd repository
+
+2. Create .env in app folder
+```bash
+  APP_CONFIG__DB__URL=postgresql+asyncpg://name:password:5432/database-name
+
+3. create certs folder in the first folder 
+In certs folder create 2 files (jwt-private.pem and jwt-public.pem) , there you can put you secret and private key
+
+4. poetry install - it will install all dependencies
+5.
+```bash
+  alembic upgrade head
 
