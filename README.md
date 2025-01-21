@@ -70,7 +70,10 @@ Ensure the following are installed:
 3. create certs folder in the first folder 
 In certs folder create 2 files (jwt-private.pem and jwt-public.pem) , there you can put you secret and private key
 
-4. poetry install - it will install all dependencies
+4. install all dependencies
+   ```bash
+poetry install
+```
 5. alembic database install
 ```bash
   alembic upgrade head
