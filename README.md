@@ -56,14 +56,16 @@ Ensure the following are installed:
 - Python 3.10 or later
 - Docker and Docker Compose
 - PostgreSQL
-  1. Clone the Repository
+
+1. Clone the Repository
   ```bash
    git clone https://github.com/CourtesyCall/assigment.git
    cd repository
-
+```
 2. Create .env in app folder
 ```bash
   APP_CONFIG__DB__URL=postgresql+asyncpg://name:password:5432/database-name
+```
 
 3. create certs folder in the first folder 
 In certs folder create 2 files (jwt-private.pem and jwt-public.pem) , there you can put you secret and private key
@@ -72,4 +74,4 @@ In certs folder create 2 files (jwt-private.pem and jwt-public.pem) , there you 
 5.
 ```bash
   alembic upgrade head
-
+```
