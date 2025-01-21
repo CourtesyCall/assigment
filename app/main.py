@@ -25,6 +25,13 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )
+
+
+@app.get("/")
+async def check_life():
+    return {"status": "ok"}
+
+
 app.include_router(api_router)
 
 if __name__ == "__main__":

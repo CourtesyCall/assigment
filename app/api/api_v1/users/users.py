@@ -15,6 +15,7 @@ from .crud import (
 )
 
 from .schemas import UserRead, UserCreate, UserUpdate
+from ...auth.auth import get_current_active_auth_user
 
 router = APIRouter(
     tags=["Users"],
@@ -22,7 +23,7 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=list[UserRead])
+@router.get("", response_model=list[UserRead], summary="Get a list of all users")
 async def get_users(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
@@ -30,7 +31,7 @@ async def get_users(
     return users
 
 
-@router.post("/create", response_model=UserRead)
+@router.post("/create", response_model=UserRead, summary="Create a new user")
 async def create_user(
     user_create: UserCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -40,27 +41,27 @@ async def create_user(
     return user
 
 
-@router.put("/{user_id}", response_model=UserRead)
+@router.put("/{user_id}", response_model=UserRead, summary="Update a user's data by ID")
 async def update_user(
-    user_id: int,
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
     user_update: UserUpdate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
-    user = await put_user_one(session=session, user_id=user_id, user_update=user_update)
+    user = await put_user_one(session=session, user_id=user.id, user_update=user_update)
 
     return user
 
 
-@router.delete("/{user_id}", response_model=dict)
+@router.delete("/{user_id}", response_model=dict, summary="Delete a user's data by ID")
 async def delete_user(
-    user_id: int,
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
-    result = await user_delete_id(session=session, user_id=user_id)
+    result = await user_delete_id(session=session, user_id=user.id)
     return result
 
 
-@router.get("/{user_id}", response_model=UserRead)
+@router.get("/{user_id}", response_model=UserRead, summary="Get a user's data by ID")
 async def get_user_by_id(
     user_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -69,7 +70,11 @@ async def get_user_by_id(
     return user
 
 
-@router.get("/search", response_model=list[UserRead])
+@router.get(
+    "/search",
+    response_model=list[UserRead],
+    summary="Search users by username or email",
+)
 async def search_users(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     username: Optional[str] = None,
@@ -81,7 +86,11 @@ async def search_users(
     return user
 
 
-@router.get("/pagination", response_model=list[UserRead])
+@router.get(
+    "/pagination",
+    response_model=list[UserRead],
+    summary="Get a paginated list of users",
+)
 async def get_users(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     skip: int = 0,

@@ -17,6 +17,14 @@ class UserSchema(BaseModel):
     password: Annotated[str, MinLen(8)]
 
 
+class User(BaseModel):
+    model_config = ConfigDict(strict=True)
+    username: str
+    password: bytes
+    email: EmailStr | None = None
+    active: bool = True
+
+
 class UserCreate(UserSchema):
     pass
 
@@ -41,7 +49,7 @@ class UserUpdate(BaseModel):
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    username: str
     password: str
 
 

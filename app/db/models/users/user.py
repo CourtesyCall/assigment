@@ -23,6 +23,8 @@ class User(Base):
     blogs: Mapped[list["Blog"]] = relationship(back_populates="author")
     comments: Mapped[list["Comment"]] = relationship(back_populates="author")
 
+    __table_args__ = {"extend_existing": True}
+
     # blogs = relationship("Blog", back_populates="author", cascade="all, delete")
     # comments = relationship("Comment", back_populates="author", cascade="all, delete")
     # likes = relationship("Like", back_populates="user", cascade="all, delete")

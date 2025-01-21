@@ -1,11 +1,15 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BlogCreate(BaseModel):
     title: str
-    content: str
+    content: str = Field(
+        ...,
+        max_length=1000,
+        description="Content of the blog, must not exceed 1000 characters",
+    )
 
 
 class BlogRead(BlogCreate):

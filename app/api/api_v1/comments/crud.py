@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.api_v1.comments.schemas import CommentSchema
+from core.error_handler import verify_user_exists, verify_ownership
 from db.models.comments.comment import Comment
 
 
@@ -15,8 +16,10 @@ async def get_comments(session: AsyncSession) -> Sequence[Comment]:
 
 
 async def create_comment(
-    session: AsyncSession, comment_create: CommentSchema
+    session: AsyncSession, comment_create: CommentSchema, author_id: int
 ) -> Comment:
+    await verify_user_exists(session, author_id)
+
     comment = Comment(
         content=comment_create.content,
         blog_id=comment_create.blog_id,
@@ -28,9 +31,13 @@ async def create_comment(
     return comment
 
 
-async def delete_comment(session: AsyncSession, comment_id: int):
+async def delete_comment(
+    session: AsyncSession, comment_id: int, author_id: int
+) -> None:
+    await verify_user_exists(session, author_id)
     comment = await get_comment_by_id(session, comment_id)
     if comment:
+        verify_ownership(comment.author_id, author_id)
         await session.delete(comment)
         await session.commit()
 

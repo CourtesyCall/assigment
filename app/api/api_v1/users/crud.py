@@ -16,6 +16,25 @@ async def get_all_users(session: AsyncSession) -> Sequence[User]:
 
 
 async def create_user_one(user_create: UserCreate, session: AsyncSession) -> User:
+
+    existing_user_query = select(User).where(
+        (User.email == user_create.email) | (User.username == user_create.username)
+    )
+    result = await session.execute(existing_user_query)
+    existing_user = result.scalar_one_or_none()
+
+    if existing_user:
+        if existing_user.email == user_create.email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A user with this email already exists.",
+            )
+        if existing_user.username == user_create.username:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A user with this username already exists.",
+            )
+
     hashed_password = hash_password(user_create.password)
     user_data = user_create.model_dump()
     user_data["password"] = hashed_password
@@ -81,14 +100,22 @@ async def get_user_by_name(session: AsyncSession, name: str) -> User | None:
     user = result.scalar_one_or_none()
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
     return user
 
 
 async def get_user_by_email(session: AsyncSession, email: str):
-    user = await session.get(User, email)
+    query = select(User).where(User.email == email)
+    result = await session.execute(query)
+    user = result.scalar_one_or_none()
+
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
     return user
 
 

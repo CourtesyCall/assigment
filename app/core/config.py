@@ -4,7 +4,7 @@ from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class StartConfig(BaseModel):
@@ -29,10 +29,19 @@ class DataBaseSettings(BaseModel):
 
 
 class AuthJWT(BaseModel):
-    private_key: Path = BASE_DIR / "certs" / "jwt-private.pem"
-    public_key: Path = BASE_DIR / "certs" / "jwt-public.pem"
+    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
     algorithm: str = "RS256"
-    access_token_expires: int = 3
+    access_token_expires: int = 15
+    refresh_token_expires_days: int = 25
+
+    @property
+    def private_key(self) -> str:
+        return self.private_key_path.read_text()
+
+    @property
+    def public_key(self) -> str:
+        return self.public_key_path.read_text()
 
 
 class Settings(BaseSettings):
